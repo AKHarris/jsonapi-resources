@@ -14,6 +14,8 @@ module JSONAPI
                 :allow_include,
                 :allow_sort,
                 :allow_filter,
+                :allow_query,
+                :query_key,
                 :default_paginator,
                 :default_page_size,
                 :maximum_page_size,
@@ -42,6 +44,10 @@ module JSONAPI
       self.allow_include = true
       self.allow_sort = true
       self.allow_filter = true
+
+      # optional query config
+      self.allow_query = false
+      self.query_key = :q
 
       self.raise_if_parameters_not_allowed = true
 
@@ -96,6 +102,8 @@ module JSONAPI
     end
 
     attr_writer :allow_include, :allow_sort, :allow_filter
+
+    attr_writer :allow_query, :query_key
 
     attr_writer :default_paginator
 

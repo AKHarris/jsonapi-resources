@@ -86,7 +86,7 @@ module JSONAPI
     end
 
     def setup_request
-      @request = JSONAPI::Request.new(params, context: context, key_formatter: key_formatter)
+      @request = JSONAPI::Request.new(params, context: context, key_formatter: key_formatter, query_key: query_key)
 
       render_errors(@request.errors) unless @request.errors.empty?
     rescue => e
@@ -116,6 +116,10 @@ module JSONAPI
 
     def route_formatter
       JSONAPI.configuration.route_formatter
+    end
+
+    def query_key
+      JSONAPI.configuration.query_key
     end
 
     def base_response_meta
