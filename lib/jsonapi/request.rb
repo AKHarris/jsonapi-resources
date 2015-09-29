@@ -5,7 +5,8 @@ module JSONAPI
   class Request
     attr_accessor :fields, :include, :filters, :sort_criteria, :errors, :operations,
                   :resource_klass, :context, :paginator, :source_klass, :source_id,
-                  :include_directives, :params, :warnings, :server_error_callbacks
+                  :include_directives, :params, :warnings, :server_error_callbacks,
+                  :query_key, :query
 
     def initialize(params = nil, options = {})
       @params = params
@@ -16,6 +17,8 @@ module JSONAPI
       @operations = []
       @fields = {}
       @filters = {}
+      @query_key = options[:query_key]
+      @query = nil
       @sort_criteria = [{ field: 'id', direction: :asc }]
       @source_klass = nil
       @source_id = nil
@@ -46,10 +49,18 @@ module JSONAPI
       parse_fields(params[:fields])
       parse_include_directives(params[:include])
       set_default_filters
+
+      # set the query string
+      set_query(params[query_key]) if query_key
+
       parse_filters(params[:filter])
       parse_sort_criteria(params[:sort])
       parse_pagination(params[:page])
       add_find_operation
+    end
+
+    def set_query(query)
+      @query = query
     end
 
     def setup_get_related_resource_action(params)
@@ -295,6 +306,7 @@ module JSONAPI
         @resource_klass,
         context: @context,
         filters: @filters,
+        query: @query,
         include_directives: @include_directives,
         sort_criteria: @sort_criteria,
         paginator: @paginator

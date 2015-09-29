@@ -14,11 +14,12 @@ module JSONAPI
   end
 
   class FindOperation < Operation
-    attr_reader :filters, :include_directives, :sort_criteria, :paginator
+    attr_reader :filters, :query, :include_directives, :sort_criteria, :paginator
 
     def initialize(resource_klass, options = {})
       super(resource_klass, options)
       @filters = options[:filters]
+      @query = options[:query]
       @include_directives = options[:include_directives]
       @sort_criteria = options.fetch(:sort_criteria, [])
       @paginator = options[:paginator]
@@ -27,8 +28,21 @@ module JSONAPI
 
     def record_count
       @_record_count ||= @resource_klass.find_count(@resource_klass.verify_filters(@filters, @context),
+                                                    query: @query,
                                                     context: @context,
+                                                    sort_criteria: @sort_criteria,
+                                                    paginator: @paginator,
                                                     include_directives: @include_directives)
+    end
+
+    def meta
+      @_meta ||= @resource_klass.meta(@resource_klass.verify_filters(@filters, @context),
+                                      query: @query,
+                                      context: @context,
+                                      sort_criteria: @sort_criteria,
+                                      paginator: @paginator,
+                                      include_directives: @include_directives
+                                     )
     end
 
     def pagination_params
@@ -43,6 +57,7 @@ module JSONAPI
 
     def apply
       resource_records = @resource_klass.find(@resource_klass.verify_filters(@filters, @context),
+                                              query: @query,
                                               context: @context,
                                               include_directives: @include_directives,
                                               sort_criteria: @sort_criteria,
@@ -57,6 +72,8 @@ module JSONAPI
         options[:record_count] = record_count
       end
 
+      # add custom meta information if the resource klass supports that method
+      options[:meta] = meta if @resource_klass.respond_to?(:meta)
       return JSONAPI::ResourcesOperationResult.new(:ok,
                                                    resource_records,
                                                    options)
