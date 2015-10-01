@@ -6,7 +6,7 @@ module JSONAPI
     attr_accessor :fields, :include, :filters, :sort_criteria, :errors, :operations,
                   :resource_klass, :context, :paginator, :source_klass, :source_id,
                   :include_directives, :params, :warnings, :server_error_callbacks,
-                  :query_key, :query
+                  :query_key, :query, :bbox
 
     def initialize(params = nil, options = {})
       @params = params
@@ -19,6 +19,7 @@ module JSONAPI
       @filters = {}
       @query_key = options[:query_key]
       @query = nil
+      @bbox = params[:bbox]
       @sort_criteria = [{ field: 'id', direction: :asc }]
       @source_klass = nil
       @source_id = nil
@@ -307,6 +308,7 @@ module JSONAPI
         context: @context,
         filters: @filters,
         query: @query,
+        bbox: @bbox,
         include_directives: @include_directives,
         sort_criteria: @sort_criteria,
         paginator: @paginator

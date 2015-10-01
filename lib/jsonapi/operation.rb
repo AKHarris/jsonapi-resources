@@ -14,12 +14,13 @@ module JSONAPI
   end
 
   class FindOperation < Operation
-    attr_reader :filters, :query, :include_directives, :sort_criteria, :paginator
+    attr_reader :filters, :query, :bbox, :include_directives, :sort_criteria, :paginator
 
     def initialize(resource_klass, options = {})
       super(resource_klass, options)
       @filters = options[:filters]
       @query = options[:query]
+      @bbox = options[:bbox]
       @include_directives = options[:include_directives]
       @sort_criteria = options.fetch(:sort_criteria, [])
       @paginator = options[:paginator]
@@ -29,6 +30,7 @@ module JSONAPI
     def record_count
       @_record_count ||= @resource_klass.find_count(@resource_klass.verify_filters(@filters, @context),
                                                     query: @query,
+                                                    bbox: @bbox,
                                                     context: @context,
                                                     sort_criteria: @sort_criteria,
                                                     paginator: @paginator,
@@ -38,6 +40,7 @@ module JSONAPI
     def meta
       @_meta ||= @resource_klass.meta(@resource_klass.verify_filters(@filters, @context),
                                       query: @query,
+                                      bbox: @bbox,
                                       context: @context,
                                       sort_criteria: @sort_criteria,
                                       paginator: @paginator,
@@ -58,6 +61,7 @@ module JSONAPI
     def apply
       resource_records = @resource_klass.find(@resource_klass.verify_filters(@filters, @context),
                                               query: @query,
+                                              bbox: @bbox,
                                               context: @context,
                                               include_directives: @include_directives,
                                               sort_criteria: @sort_criteria,
