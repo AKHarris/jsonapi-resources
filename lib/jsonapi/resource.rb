@@ -301,7 +301,11 @@ module JSONAPI
       def custom_link(name, type, options={})
         link_manifest = { type: type.to_sym }
         extension = options[:ext] || options[:extension]
+        relative_path = options[:path] || options[:relative_path]
+        condition = options[:if] 
+
         link_manifest.merge!(ext: extension) if extension
+        link_manifest.merge!(if: condition) if condition
 
         @_custom_links[name.to_sym] = link_manifest
       end

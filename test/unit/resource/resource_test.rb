@@ -58,6 +58,13 @@ class CustomLinkTestResource < JSONAPI::Resource
   custom_link :raw, :self
 end
 
+class CustomLinkTestWithConditionResource < JSONAPI::Resource
+  model_name 'Post'
+
+  custom_link :raw, :self, if: ->(instance) { instance.class._model_name.to_s == "Post" }
+end
+
+
 class CustomLinkTestWithExtensionResource < JSONAPI::Resource
   model_name 'Post'
 
@@ -81,6 +88,11 @@ class ResourceTest < ActiveSupport::TestCase
   def test_custom_links_with_extension
     registered_custom_link = { raw: { type: :self, ext: :xml } }
     assert_equal(CustomLinkTestWithExtensionResource.new(Post.first, {}).custom_links, registered_custom_link)
+  end
+
+  def test_custom_link_with_condition
+    custom_link_proc = CustomLinkTestWithConditionResource.new(Post.first, {}).custom_links[:raw][:if]
+    assert_equal(custom_link_proc.class, Proc)
   end
 
   def test_model_name
