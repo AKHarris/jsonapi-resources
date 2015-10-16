@@ -19,7 +19,7 @@ module JSONAPI
       @filters = {}
       @query_key = options[:query_key]
       @query = nil
-      @bbox = params[:bbox]
+      @bbox = nil #params[:bbox]
       @sort_criteria = [{ field: 'id', direction: :asc }]
       @source_klass = nil
       @source_id = nil
@@ -52,7 +52,7 @@ module JSONAPI
       set_default_filters
 
       # set the query string
-      set_query(params[query_key]) if query_key
+      set_query(params) if query_key
 
       parse_filters(params[:filter])
       parse_sort_criteria(params[:sort])
@@ -60,8 +60,13 @@ module JSONAPI
       add_find_operation
     end
 
-    def set_query(query)
-      @query = query
+    def set_query(params)
+      @query = params[query_key]
+      if params[:bbox]
+        @bbox = params[:bbox]
+      end
+      
+      params
     end
 
     def setup_get_related_resource_action(params)

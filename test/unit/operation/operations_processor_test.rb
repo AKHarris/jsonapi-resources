@@ -281,7 +281,6 @@ class OperationsProcessorTest < Minitest::Test
         }
       )
     ]
-
     request = JSONAPI::Request.new
     request.operations = operations
 
